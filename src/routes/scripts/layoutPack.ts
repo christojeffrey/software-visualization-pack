@@ -7,9 +7,9 @@ import {
 	layers,
 	PADDING_INNER_PACK,
 	PADDING_INTER_PACK,
-	PADDING_X_LAYER,
-} from "$lib/constant";
-import * as d3 from "d3";
+	PADDING_X_LAYER
+} from '$lib/constant';
+import * as d3 from 'd3';
 
 export default function layoutPack(roots: any[]) {
 	const layerCountProto: any = layers.reduce(
@@ -17,7 +17,7 @@ export default function layoutPack(roots: any[]) {
 			obj[item] = 0;
 			return obj;
 		},
-		{ "Unknown Layer": 0 },
+		{ 'Unknown Layer': 0 }
 	);
 	// COMPUTE
 	roots.forEach((root) => {
@@ -95,9 +95,7 @@ function doesCircleOverlap(circle1: Circle, circle2: Circle) {
 
 // find the x and lock the y for the circle to not overlap new x must be to the right of the circle1
 function findMoveNeededInXForCircle2(circle1: Circle, circle2: Circle) {
-	const targetDistanceInX = Math.sqrt(
-		(circle1.r + circle2.r) ** 2 - (circle1.y - circle2.y) ** 2,
-	);
+	const targetDistanceInX = Math.sqrt((circle1.r + circle2.r) ** 2 - (circle1.y - circle2.y) ** 2);
 	if (Number.isNaN(targetDistanceInX)) {
 		return 0;
 	}
@@ -112,9 +110,7 @@ function findMoveNeededInXForCircle2(circle1: Circle, circle2: Circle) {
 
 // find the y and lock the x for the circle to not overlap new y must be to the bottom of the circle1
 function findMoveNeededInYForCircle2(circle1: Circle, circle2: Circle) {
-	const targetDistanceInY = Math.sqrt(
-		(circle1.r + circle2.r) ** 2 - (circle1.x - circle2.x) ** 2,
-	);
+	const targetDistanceInY = Math.sqrt((circle1.r + circle2.r) ** 2 - (circle1.x - circle2.x) ** 2);
 	if (Number.isNaN(targetDistanceInY)) {
 		return 0;
 	}
@@ -133,11 +129,11 @@ function calculateRootsLocationBasedOnDominantLayer(roots: any[]) {
 	// height is the biggest pack size
 	const biggestRootRadius = roots.reduce((acc, root) => {
 		if (acc.value < root.value) {
-		return root;
+			return root;
 		}
 		return acc;
 	});
-	
+
 	// arbitrary layer height: 3 times the biggest root radius
 	const layerHeight = biggestRootRadius.r * LAYER_SIZE_MULTIPLIER;
 	roots.forEach((root) => {
@@ -155,7 +151,9 @@ function calculateRootsLocationBasedOnDominantLayer(roots: any[]) {
 			const layer2 = dominantLayer[1].layer;
 			const layer1Index = layers.indexOf(layer1);
 			const layer2Index = layers.indexOf(layer2);
-			if (layer1Index + 1 === layer2Index || layer1Index - 1 === layer2Index) {
+			if (layer1 === 'Unknown Layer' || layer2 === 'Unknown Layer') {
+				root.isCrossOver = true;
+			} else if (layer1Index + 1 === layer2Index || layer1Index - 1 === layer2Index) {
 				const layer1 = dominantLayer[0].layer;
 				const layer1Index = layers.indexOf(layer1);
 				const layer1Location = (layer1Index + 0.5) * layerHeight;
@@ -167,8 +165,9 @@ function calculateRootsLocationBasedOnDominantLayer(roots: any[]) {
 				const layer2Percentage = dominantLayer[1].percentage;
 
 				// calculate based on ratio
-				const distanceAdded = (layer2Location - layer1Location) *
-				(layer2Percentage / (layer1Percentage + layer2Percentage));
+				const distanceAdded =
+					(layer2Location - layer1Location) *
+					(layer2Percentage / (layer1Percentage + layer2Percentage));
 				root.containerY = layer1Location + distanceAdded;
 			} else {
 				root.isCrossOver = true;
@@ -180,11 +179,10 @@ function calculateRootsLocationBasedOnDominantLayer(roots: any[]) {
 		} else {
 			root.isCrossOver = true;
 		}
-		
+
 		if (root.isCrossOver) {
 			crossOvers.push(root);
 		} else {
-
 			// the coordinate is from top left.
 			root.containerY -= root.r;
 
@@ -199,17 +197,16 @@ function calculateRootsLocationBasedOnDominantLayer(roots: any[]) {
 					const circle1 = {
 						x: previousRoot.containerX + previousRoot.r, // center of the circle
 						y: previousRoot.containerY + previousRoot.r, // center of the circle
-						r: previousRoot.r,
+						r: previousRoot.r
 					};
 					const circle2 = {
 						x: root.containerX + root.r, // center of the circle
 						y: root.containerY + root.r, // center of the circle
-						r: root.r,
+						r: root.r
 					};
 					if (doesCircleOverlap(circle1, circle2)) {
 						isOverlap = true;
-						root.containerX += findMoveNeededInXForCircle2(circle1, circle2) +
-							PADDING_INTER_PACK;
+						root.containerX += findMoveNeededInXForCircle2(circle1, circle2) + PADDING_INTER_PACK;
 						break;
 					}
 				}
@@ -222,9 +219,9 @@ function calculateRootsLocationBasedOnDominantLayer(roots: any[]) {
 		return Math.max(maxWidth, root.containerX + root.r * 2);
 	}, 0);
 
-	crossOvers.forEach((root)=> {
+	crossOvers.forEach((root) => {
 		// the coordinate is from top left.
-		root.containerX = maxWidth + (layerHeight/2) - root.r + PADDING_X_LAYER;
+		root.containerX = maxWidth + layerHeight / 2 - root.r + PADDING_X_LAYER;
 
 		// calculate the x. check if it overlaps with previous roots. if it does, move it to the right then check again
 		root.containerY = PADDING_X_LAYER;
@@ -237,22 +234,20 @@ function calculateRootsLocationBasedOnDominantLayer(roots: any[]) {
 				const circle1 = {
 					x: previousRoot.containerX + previousRoot.r, // center of the circle
 					y: previousRoot.containerY + previousRoot.r, // center of the circle
-					r: previousRoot.r,
+					r: previousRoot.r
 				};
 				const circle2 = {
 					x: root.containerX + root.r, // center of the circle
 					y: root.containerY + root.r, // center of the circle
-					r: root.r,
+					r: root.r
 				};
 				if (doesCircleOverlap(circle1, circle2)) {
 					isOverlap = true;
-					root.containerY += findMoveNeededInYForCircle2(circle1, circle2) +
-						PADDING_INTER_PACK*2;
+					root.containerY += findMoveNeededInYForCircle2(circle1, circle2) + PADDING_INTER_PACK * 2;
 					break;
 				}
 			}
 		} while (isOverlap);
 		previousRoots.push(root);
 	});
-	
 }
