@@ -33,3 +33,13 @@ A CSV file that looks like this:
 Explanation: In the class `com.fsck.k9.FontSizes` in the example above, 13.5% of its methods exhibit *presentation layer* indications, 81.1% exhibits *domain layer* indications, and 5.4% methods with *data source layer* indications.
 
 For examples complete files that can be loaded into the visualisation, see: [data/bubbletea-viz](https://github.com/rsatrioadi/phd/tree/main/data/bubbletea-viz)
+
+## How to run using docker
+1. Build the docker image
+```bash
+docker build -t bubbletea-viz .
+```
+2. Run the docker image
+```bash
+docker run -p 3000:3000 bubbletea-viz
+```
